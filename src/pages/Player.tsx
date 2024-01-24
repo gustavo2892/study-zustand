@@ -2,21 +2,21 @@ import { useEffect } from 'react';
 import { MessageCircle } from 'lucide-react';
 
 import { Header, Video, Module } from '../components';
-import { useAppSelector, useAppDispatch } from '../store';
-import { useCurrentLesson, loadCourse } from '../store/slices/player';
+import { useCurrentLesson, useStore } from '../store';
 
 export function Player() {
-  const dispatch = useAppDispatch();
-
-  const modules = useAppSelector(state => {
-    return state.player.course?.modules
+  const { course, load, isLoading } = useStore(store => {
+    return {
+      course: store.course,
+      load: store.load,
+      isLoading: store.isLoading
+    };
   });
 
   const { currentLesson } = useCurrentLesson();
-  const isCourseLoading = useAppSelector(state => state.player.isLoading);
-
+  
   useEffect(() => {
-    dispatch(loadCourse());
+    load();
   }, []);
 
   useEffect(() => {
@@ -41,10 +41,10 @@ export function Player() {
           <div className="flex-1">
             <Video />
           </div>
-          <aside data-loading={isCourseLoading} className="data-[loading=true]:animate-pulse w-80 absolute top-0 bottom-0 right-0 border-l divide-y-2 divide-zinc-900 border-zinc-800 bg-zinc-900 overflow-y-scroll scrollbar scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800">
+          <aside data-loading={isLoading} className="data-[loading=true]:animate-pulse w-80 absolute top-0 bottom-0 right-0 border-l divide-y-2 divide-zinc-900 border-zinc-800 bg-zinc-900 overflow-y-scroll scrollbar scrollbar-thin scrollbar-track-zinc-950 scrollbar-thumb-zinc-800">
             {
-            !isCourseLoading ?
-              modules && modules.map((module, index) => {
+            !isLoading ?
+            course?.modules && course?.modules.map((module, index) => {
                 return (
                   <Module
                     key={module.id}
